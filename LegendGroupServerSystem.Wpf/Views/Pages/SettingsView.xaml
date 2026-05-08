@@ -1,0 +1,73 @@
+﻿<UserControl
+    x:Class="LegendGroupServerSystem.WPf.Views.Pages.SettingsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:LegendGroupServerSystem.WPf.Views.Pages"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:pages="clr-namespace:LegendGroupServerSystem.WPf.ViewModels.Pages"
+    d:DataContext="{d:DesignInstance Type=pages:SettingsViewModel}"
+    d:DesignHeight="450"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+    <Grid Margin="50">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Button
+            Width="120"
+            Margin="0,0,5,10"
+            Padding="10,5"
+            Command="{Binding ToggleConnectionCommand}"
+            Content="{Binding ConnectionButtonContent}" />
+        <Button
+            Grid.Column="1"
+            Width="120"
+            Margin="5,0,0,10"
+            Padding="10,5"
+            Command="{Binding SaveConfigCommand}"
+            Content="保存设置" />
+        <Label
+            Grid.Row="1"
+            Margin="0,0,5,10"
+            HorizontalAlignment="Center"
+            Content="服务器地址:" />
+        <TextBox
+            Grid.Row="1"
+            Grid.Column="1"
+            Margin="5,0,0,10"
+            VerticalAlignment="Center"
+            IsEnabled="{Binding IsInputsEnabled}"
+            Text="{Binding ServerUrl, UpdateSourceTrigger=PropertyChanged}" />
+        <Label
+            Grid.Row="2"
+            Margin="0,0,5,10"
+            HorizontalAlignment="Center"
+            Content="设备名:" />
+        <TextBox
+            Grid.Row="2"
+            Grid.Column="1"
+            Margin="5,0,0,10"
+            VerticalAlignment="Center"
+            IsEnabled="{Binding IsInputsEnabled}"
+            Text="{Binding DeviceName, UpdateSourceTrigger=PropertyChanged}" />
+        <Label
+            Grid.Row="3"
+            HorizontalAlignment="Center"
+            Content="通讯密钥:" />
+        <TextBox
+            Grid.Row="3"
+            Grid.Column="1"
+            IsEnabled="{Binding IsInputsEnabled}"
+            Text="{Binding ApiKey, UpdateSourceTrigger=PropertyChanged}"
+            TextWrapping="Wrap"
+            VerticalScrollBarVisibility="Auto" />
+    </Grid>
+</UserControl>
