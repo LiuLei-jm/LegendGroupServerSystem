@@ -48,8 +48,11 @@ public class FileOperationService : IFileOperationService
         }
     }
 
-
-    public async Task RemoveContentFromFileAsync(string filePath, string contentToRemove, string logMessage)
+    public async Task RemoveContentFromFileAsync(
+        string filePath,
+        string contentToRemove,
+        string logMessage
+    )
     {
         try
         {
@@ -64,8 +67,10 @@ public class FileOperationService : IFileOperationService
                 return;
             }
             var originalContentLines = await File.ReadAllLinesAsync(filePath);
-            if (!originalContentLines.Contains(contentToRemove)) return;
-            if (originalContentLines.Length == 0 || string.IsNullOrEmpty(contentToRemove)) return;
+            if (!originalContentLines.Contains(contentToRemove))
+                return;
+            if (originalContentLines.Length == 0 || string.IsNullOrEmpty(contentToRemove))
+                return;
             var filteredLines = originalContentLines.Where(line => !line.Contains(contentToRemove));
             await File.WriteAllLinesAsync(filePath, filteredLines);
             _logger.LogInfo(logMessage);
@@ -75,6 +80,7 @@ public class FileOperationService : IFileOperationService
             _logger.LogError($"删除文件内容失败，文件：{filePath},错误：{ex.Message}");
         }
     }
+
     private bool IsValidFilePath(string filePath)
     {
         try
@@ -83,11 +89,20 @@ public class FileOperationService : IFileOperationService
                 return false;
             string fullPath = Path.GetFullPath(filePath);
             string appDirectory = Helper.GetExeCurrentPath();
-            if (fullPath.StartsWith(appDirectory, StringComparison.OrdinalIgnoreCase)) return true;
-            if (Path.IsPathRooted(fullPath) && fullPath.Length >= 2 && char.IsLetter(fullPath[0]) && fullPath[1] == ':') return true;
-            if (filePath.Contains("..")) return false;
+            if (fullPath.StartsWith(appDirectory, StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (
+                Path.IsPathRooted(fullPath)
+                && fullPath.Length >= 2
+                && char.IsLetter(fullPath[0])
+                && fullPath[1] == ':'
+            )
+                return true;
+            if (filePath.Contains(".."))
+                return false;
             var invalidChars = Path.GetInvalidPathChars();
-            if (filePath.Any(c => invalidChars.Contains(c))) return false;
+            if (filePath.Any(c => invalidChars.Contains(c)))
+                return false;
             return true;
         }
         catch
@@ -95,5 +110,4 @@ public class FileOperationService : IFileOperationService
             return false;
         }
     }
-
 }

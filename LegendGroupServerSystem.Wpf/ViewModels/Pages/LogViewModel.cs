@@ -8,7 +8,7 @@ using System.Windows.Threading;
 
 namespace LegendGroupServerSystem.WPf.ViewModels.Pages;
 
-public partial class LogViewModel : ObservableObject, IRecipient<AppLogMessage>
+public partial class LogViewModel : ObservableObject, IRecipient<AppLogMessage>, IDisposable
 {
     private const int MaxLogsCount = 1000;
     private readonly Dispatcher _dispatcher;
@@ -44,9 +44,17 @@ public partial class LogViewModel : ObservableObject, IRecipient<AppLogMessage>
     {
         Logs.Clear();
     }
-    private void Dispose()
+    public void Dispose()
     {
-        WeakReferenceMessenger.Default.UnregisterAll(this);
-        Logs.CollectionChanged -= OnLogsCollectionChanged;
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    protected virtual void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            _messenger?.Unregister<AppLogMessage>(this);
+            Logs?.CollectionChanged -= OnLogsCollectionChanged;
+        }
     }
 }

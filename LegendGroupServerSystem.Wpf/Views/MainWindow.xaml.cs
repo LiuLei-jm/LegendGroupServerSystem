@@ -10,6 +10,7 @@ namespace legendGroupServerSystem.Wpf;
 public partial class MainWindow : Window
 {
     private Forms.NotifyIcon _notifyIcon;
+
     public MainWindow(MainViewModel mainViewModel)
     {
         InitializeComponent();
@@ -18,11 +19,15 @@ public partial class MainWindow : Window
         {
             Icon = new System.Drawing.Icon("Resources/favicon.ico"),
             Visible = true,
-            Text = "传奇功能网关"
+            Text = "传奇功能网关",
         };
-        _notifyIcon.DoubleClick += (s, e) => { Show(); WindowState = WindowState.Normal; Activate(); };
+        _notifyIcon.DoubleClick += (s, e) =>
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Activate();
+        };
     }
-
 
     private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
     {
@@ -31,6 +36,8 @@ public partial class MainWindow : Window
 
     private void Window_StateChanged(object sender, EventArgs e)
     {
-        if (WindowState == WindowState.Minimized) Hide();
+        if (WindowState == WindowState.Minimized)
+            Hide();
     }
 }
+

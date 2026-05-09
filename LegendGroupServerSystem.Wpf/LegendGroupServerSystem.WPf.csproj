@@ -8,6 +8,7 @@
 		<UseWPF>true</UseWPF>
 		<UseWindowsForms>true</UseWindowsForms>
 		<ApplicationIcon>Resources\favicon.ico</ApplicationIcon>
+		<AssemblyName>传奇功能网关</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -22,7 +22,8 @@ public static class AutoScrollBehavior
         DependencyProperty.RegisterAttached("Enable", typeof(bool), typeof(AutoScrollBehavior), new PropertyMetadata(false, propertyChangedCallback: OnEnableChanged));
     private static readonly DependencyProperty CollectionChangedHandlerProperty =
         DependencyProperty.RegisterAttached("CollectionChangedHandler", typeof(NotifyCollectionChangedEventHandler), typeof(AutoScrollBehavior));
-
+    private static readonly DependencyProperty ScrollChangedHandlerProperty =
+        DependencyProperty.RegisterAttached("ScrollChangedHandler", typeof(ScrollChangedEventHandler), typeof(AutoScrollBehavior));
     private static void OnEnableChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
     {
         if (d is ItemsControl itemsControl)
@@ -36,6 +37,7 @@ public static class AutoScrollBehavior
             {
                 itemsControl.Loaded -= ItemsControl_Loaded;
                 itemsControl.Unloaded -= ItemsControl_Unloaded;
+                ItemsControl_Unloaded(itemsControl, new RoutedEventArgs());
             }
         }
     }
@@ -52,6 +54,16 @@ public static class AutoScrollBehavior
                 itemsControl.ClearValue(CollectionChangedHandlerProperty);
             }
         }
+        var scrollViewer = FindScrollViewer(itemsControl);
+        if (scrollViewer != null)
+        {
+            var handler = (ScrollChangedEventHandler)itemsControl.GetValue(ScrollChangedHandlerProperty);
+            if (handler != null)
+            {
+                scrollViewer.ScrollChanged -= handler;
+                scrollViewer.ClearValue(ScrollChangedHandlerProperty);
+            }
+        }
     }
 
     private static void ItemsControl_Loaded(object sender, RoutedEventArgs e)
@@ -59,23 +71,26 @@ public static class AutoScrollBehavior
         if (sender is not ItemsControl itemsControl) return;
         var scrollViewer = FindScrollViewer(itemsControl);
         if (scrollViewer == null) return;
-        bool autoScroll = true;
-        scrollViewer.ScrollChanged += (s, args) =>
+        ScrollChangedEventHandler scrollChangedHandler = (s, args) =>
         {
-            autoScroll = scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 1;
+            var internalAutoScrollState = scrollViewer.VerticalOffset >= scrollViewer.ScrollableHeight - 1;
+            scrollViewer.SetValue(IsAutoScrollingProperty, internalAutoScrollState);
         };
+        scrollViewer.SetValue(ScrollChangedHandlerProperty, scrollChangedHandler);
+        scrollViewer.ScrollChanged += scrollChangedHandler;
         if (itemsControl.ItemsSource is INotifyCollectionChanged collection)
         {
-            NotifyCollectionChangedEventHandler handler = (s, args) =>
+            NotifyCollectionChangedEventHandler collectionChangedHandler = (s, args) =>
             {
-                if (!autoScroll) return;
+                var currentAutoScrollState = (bool)scrollViewer.GetValue(IsAutoScrollingProperty);
+                if (!currentAutoScrollState) return;
                 itemsControl.Dispatcher.BeginInvoke(
                    new Action(() => scrollViewer.ScrollToEnd()),
                    System.Windows.Threading.DispatcherPriority.Background
                     );
             };
-            collection.CollectionChanged += handler;
-            itemsControl.SetValue(CollectionChangedHandlerProperty, handler);
+            collection.CollectionChanged += collectionChangedHandler;
+            itemsControl.SetValue(CollectionChangedHandlerProperty, collectionChangedHandler);
         }
     }
 
@@ -90,4 +105,6 @@ public static class AutoScrollBehavior
         }
         return null!;
     }
+    public static readonly DependencyProperty IsAutoScrollingProperty
+        = DependencyProperty.RegisterAttached("IsAutoScrolling", typeof(bool), typeof(AutoScrollBehavior));
 }
